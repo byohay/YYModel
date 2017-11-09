@@ -15,7 +15,7 @@
 #import "MTWeiboModel.h"
 #import "JSWeiboModel.h"
 #import "MJWeiboModel.h"
-#import "ModelBenchmark-Swift.h"
+//#import "ModelBenchmark-Swift.h"
 
 @implementation ViewController
 
@@ -35,10 +35,8 @@
 
 
 - (void)benchmarkGithubUser {
-    
-    
     printf("----------------------\n");
-    printf("Benchmark (10000 times):\n");
+    printf("Benchmark (100000 times):\n");
     printf("GHUser             from json    to json    archive\n");
 
     /// get json data
@@ -390,8 +388,8 @@
     
     
     /// Benchmark swift
-    [GithubUserBenchmark benchmark];
-    
+//    [GithubUserBenchmark benchmark];
+
     
     
     printf("----------------------\n");

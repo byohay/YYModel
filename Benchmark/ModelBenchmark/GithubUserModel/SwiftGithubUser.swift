@@ -9,9 +9,9 @@
 import Foundation
 import QuartzCore
 
-import ObjectMapper
-import HandyJSON
-import SwiftyJSON
+//import ObjectMapper
+//import HandyJSON
+//import SwiftyJSON
 
 
 extension GithubUserObjectMapper {
