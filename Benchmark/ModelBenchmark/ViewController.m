@@ -51,7 +51,6 @@
     
     /// warm up (NSDictionary's hot cache, and JSON to model framework cache)
     FEMMapping *mapping = [FEGHUser defaultMapping];
-    MTLJSONAdapter *adapter = [[MTLJSONAdapter alloc] initWithModelClass:[MTGHUser class]];
     @autoreleasepool {
         for (int i = 0; i < count; i++) {
             // Manually
@@ -67,7 +66,7 @@
             [[[[JSGHUser alloc] initWithDictionary:json error:nil] description] length];
             
             // Mantle
-            [adapter modelFromJSONDictionary:json error:nil];
+            [MTLJSONAdapter modelOfClass:MTGHUser.class fromJSONDictionary:json error:nil];
             
             // MJExtension
             [MJGHUser mj_objectWithKeyValues:json];
@@ -297,7 +296,9 @@
         begin = CACurrentMediaTime();
         @autoreleasepool {
             for (int i = 0; i < count; i++) {
-                MTGHUser *user = [adapter modelFromJSONDictionary:json error:nil];
+              MTGHUser *user =
+                  [MTLJSONAdapter modelOfClass:MTGHUser.class fromJSONDictionary:json error:nil];
+
                 [user class];
             }
         }
@@ -305,21 +306,21 @@
         printf("Mantle(#):          %8.2f   ", (end - begin) * 1000);
         
         
-        MTGHUser *user = [adapter modelFromJSONDictionary:json error:nil];
+        MTGHUser *user = [MTLJSONAdapter modelOfClass:MTGHUser.class fromJSONDictionary:json error:nil];
         if (user.userID == 0) NSLog(@"error!");
         if (!user.login) NSLog(@"error!");
         if (!user.htmlURL) NSLog(@"error");
-        
+
         [holder removeAllObjects];
         begin = CACurrentMediaTime();
         @autoreleasepool {
             for (int i = 0; i < count; i++) {
-                NSDictionary *json = [adapter JSONDictionaryFromModel:user error:nil];
+                NSDictionary *json = [MTLJSONAdapter JSONDictionaryFromModel:user];
                 [holder addObject:json];
             }
         }
         end = CACurrentMediaTime();
-        if ([NSJSONSerialization isValidJSONObject:[adapter JSONDictionaryFromModel:user error:nil]]) {
+        if ([NSJSONSerialization isValidJSONObject:[MTLJSONAdapter JSONDictionaryFromModel:user]]) {
             printf("%8.2f   ", (end - begin) * 1000);
         } else {
             printf("   error   ");
@@ -398,7 +399,7 @@
 
 - (void)benchmarkWeiboStatus {
     printf("----------------------\n");
-    printf("Benchmark (1000 times):\n");
+    printf("Benchmark (10000 times):\n");
     printf("WeiboStatus     from json    to json    archive\n");
 
     /// get json data
@@ -416,7 +417,6 @@
     
     /// warm up (NSDictionary's hot cache, and JSON to model framework cache)
     FEMMapping *mapping = [FEWeiboStatus defaultMapping];
-    MTLJSONAdapter *adapter = [[MTLJSONAdapter alloc] initWithModelClass:[MTWeiboStatus class]];
     @autoreleasepool {
         for (int i = 0; i < count * 2; i++) {
             // YYModel
@@ -429,8 +429,8 @@
             [[[JSWeiboStatus alloc] initWithDictionary:json error:nil] description];
             
             // Mantle
-            [adapter modelFromJSONDictionary:json error:nil];
-            
+          [MTLJSONAdapter modelOfClass:MTWeiboStatus.class fromJSONDictionary:json error:nil];
+
             // MJExtension
             [MJWeiboStatus mj_objectWithKeyValues:json];
         }
@@ -442,8 +442,55 @@
         [holder addObject:[NSData new]];
     }
     [holder removeAllObjects];
-    
-    
+
+//    /*------------------- Manually -------------------*/
+//
+//    {
+//        [holder removeAllObjects];
+//        begin = CACurrentMediaTime();
+//        @autoreleasepool {
+//            for (int i = 0; i < count; i++) {
+//                GHUser *user = [[GHUser alloc] initWithJSONDictionary:json];
+//                [holder addObject:user];
+//            }
+//        }
+//        end = CACurrentMediaTime();
+//        printf("Manually(#):        %8.2f   ", (end - begin) * 1000);
+//
+//
+//        GHUser *user = [[GHUser alloc] initWithJSONDictionary:json];
+//        if (user.userID == 0) NSLog(@"error!");
+//        if (!user.login) NSLog(@"error!");
+//        if (!user.htmlURL) NSLog(@"error");
+//
+//        [holder removeAllObjects];
+//        begin = CACurrentMediaTime();
+//        @autoreleasepool {
+//            for (int i = 0; i < count; i++) {
+//                NSDictionary *json = [user convertToJSONDictionary];
+//                [holder addObject:json];
+//            }
+//        }
+//        end = CACurrentMediaTime();
+//        if ([NSJSONSerialization isValidJSONObject:[user convertToJSONDictionary]]) {
+//            printf("%8.2f   ", (end - begin) * 1000);
+//        } else {
+//            printf("   error   ");
+//        }
+//
+//
+//        [holder removeAllObjects];
+//        begin = CACurrentMediaTime();
+//        @autoreleasepool {
+//            for (int i = 0; i < count; i++) {
+//                NSData *data = [NSKeyedArchiver archivedDataWithRootObject:user];
+//                [holder addObject:data];
+//            }
+//        }
+//        end = CACurrentMediaTime();
+//        printf("%8.2f\n", (end - begin) * 1000);
+//    }
+
     /*------------------- YYModel -------------------*/
     {
         [holder removeAllObjects];
@@ -571,25 +618,26 @@
         begin = CACurrentMediaTime();
         @autoreleasepool {
             for (int i = 0; i < count; i++) {
-                MTWeiboStatus *feed = [adapter modelFromJSONDictionary:json error:nil];
+              MTWeiboStatus *feed =             [MTLJSONAdapter modelOfClass:MTWeiboStatus.class fromJSONDictionary:json error:nil];
+;
                 [holder addObject:feed];
             }
         }
         end = CACurrentMediaTime();
         printf("Mantle:          %8.2f   ", (end - begin) * 1000);
-        
-        
-        MTWeiboStatus *feed = [adapter modelFromJSONDictionary:json error:nil];
+
+
+        MTWeiboStatus *feed = [MTLJSONAdapter modelOfClass:MTWeiboStatus.class fromJSONDictionary:json error:nil];
         [holder removeAllObjects];
         begin = CACurrentMediaTime();
         @autoreleasepool {
             for (int i = 0; i < count; i++) {
-                NSDictionary *json = [adapter JSONDictionaryFromModel:feed error:nil];
+                NSDictionary *json = [MTLJSONAdapter JSONDictionaryFromModel:feed];
                 [holder addObject:json];
             }
         }
         end = CACurrentMediaTime();
-        if ([NSJSONSerialization isValidJSONObject:[adapter JSONDictionaryFromModel:feed error:nil]]) {
+        if ([NSJSONSerialization isValidJSONObject:[MTLJSONAdapter JSONDictionaryFromModel:feed]]) {
             printf("%8.2f   ", (end - begin) * 1000);
         } else {
             printf("   error   ");
@@ -693,8 +741,8 @@
         logError(@"JSONModel:      ", jsUser);
         
         // Mantle
-        MTLJSONAdapter *adapter = [[MTLJSONAdapter alloc] initWithModelClass:[MTGHUser class]];
-        MTGHUser *mtUser = [adapter modelFromJSONDictionary:json error:nil];
+      MTGHUser *mtUser =             [MTLJSONAdapter modelOfClass:MTGHUser.class fromJSONDictionary:json error:nil];
+;
         logError(@"Mantle:         ", mtUser);
         
         // MJExtension
@@ -750,8 +798,8 @@
         }
         
         // Mantle
-        MTLJSONAdapter *adapter = [[MTLJSONAdapter alloc] initWithModelClass:[MTGHUser class]];
-        MTGHUser *mtUser = [adapter modelFromJSONDictionary:json error:nil];
+      MTGHUser *mtUser =             [MTLJSONAdapter modelOfClass:MTGHUser.class fromJSONDictionary:json error:nil];
+;
         logError(@"Mantle:         ", mtUser);
         
         // MJExtension
@@ -797,8 +845,8 @@
         logError(@"JSONModel:      ", jsUser);
         
         // Mantle
-        MTLJSONAdapter *adapter = [[MTLJSONAdapter alloc] initWithModelClass:[MTGHUser class]];
-        MTGHUser *mtUser = [adapter modelFromJSONDictionary:json error:nil];
+      MTGHUser *mtUser =             [MTLJSONAdapter modelOfClass:MTGHUser.class fromJSONDictionary:json error:nil];
+;
         logError(@"Mantle:         ", mtUser);
         
         // MJExtension
@@ -851,8 +899,8 @@
         }
         
         // Mantle
-        MTLJSONAdapter *adapter = [[MTLJSONAdapter alloc] initWithModelClass:[MTGHUser class]];
-        MTGHUser *mtUser = [adapter modelFromJSONDictionary:json error:nil];
+      MTGHUser *mtUser =             [MTLJSONAdapter modelOfClass:MTGHUser.class fromJSONDictionary:json error:nil];
+;
         logError(@"Mantle:         ", mtUser);
         
         // MJExtension

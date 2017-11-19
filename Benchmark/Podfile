@@ -6,7 +6,7 @@ target 'ModelBenchmark' do
 # Objective-C
 pod 'FastEasyMapping'
 pod 'JSONModel'
-pod 'Mantle'
+pod 'Mantle', '~> 1.5.8'
 pod 'MJExtension'
 pod 'YYModel'
 

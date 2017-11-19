@@ -18,26 +18,26 @@
              @"cutType" : @"cut_type"};
 }
 + (NSValueTransformer *)widthJSONTransformer {
-    return [MTLValueTransformer transformerUsingForwardBlock:^id(NSNumber *num, BOOL *success, NSError *__autoreleasing *error) {
+    return [MTLValueTransformer reversibleTransformerWithForwardBlock:^id(NSNumber *num) {
         if ([num isKindOfClass:[NSString class]]) {
             num = @([((NSString *)num) integerValue]);
         }
         return num;
-    } reverseBlock:^id(NSNumber *num, BOOL *success, NSError *__autoreleasing *error) {
+    } reverseBlock:^id(NSNumber *num) {
         return num;
     }];
-    return [MTLJSONAdapter dictionaryTransformerWithModelClass:MTWeiboPicture.class];
+    return [NSValueTransformer mtl_JSONDictionaryTransformerWithModelClass:MTWeiboPicture.class];
 }
 + (NSValueTransformer *)heightJSONTransformer {
-    return [MTLValueTransformer transformerUsingForwardBlock:^id(NSNumber *num, BOOL *success, NSError *__autoreleasing *error) {
+    return [MTLValueTransformer reversibleTransformerWithForwardBlock:^id(NSNumber *num) {
         if ([num isKindOfClass:[NSString class]]) {
             num = @([((NSString *)num) integerValue]);
         }
         return num;
-    } reverseBlock:^id(NSNumber *num, BOOL *success, NSError *__autoreleasing *error) {
+    } reverseBlock:^id(NSNumber *num) {
         return num;
     }];
-    return [MTLJSONAdapter dictionaryTransformerWithModelClass:MTWeiboPicture.class];
+    return [NSValueTransformer mtl_JSONDictionaryTransformerWithModelClass:MTWeiboPicture.class];
 }
 @end
 
@@ -139,9 +139,9 @@
              @"verifiedReasonModified" : @"verified_reason_modified"};
 }
 + (NSValueTransformer *)createdAtJSONTransformer {
-    return [MTLValueTransformer transformerUsingForwardBlock:^id(NSString *dateString, BOOL *success, NSError *__autoreleasing *error) {
+    return [MTLValueTransformer reversibleTransformerWithForwardBlock:^id(NSString *dateString) {
         return [[DateFormatter weiboDataFormatter] dateFromString:dateString];
-    } reverseBlock:^id(NSDate *date, BOOL *success, NSError *__autoreleasing *error) {
+    } reverseBlock:^id(NSDate *date) {
         return [[DateFormatter weiboDataFormatter] stringFromDate:date];
     }];
 }
@@ -184,38 +184,38 @@
              @"darwinTags" : @"darwin_tags"};
 }
 + (NSValueTransformer *)picInfosJSONTransformer {
-    static MTLJSONAdapter *pictureAdapter;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        pictureAdapter = [[MTLJSONAdapter alloc] initWithModelClass:[MTWeiboPicture class]];
-    });
-    
-    return [MTLValueTransformer transformerUsingForwardBlock:^id(NSDictionary *dic, BOOL *success, NSError *__autoreleasing *error) {
+//    static MTLJSONAdapter *pictureAdapter;
+//    static dispatch_once_t onceToken;
+//    dispatch_once(&onceToken, ^{
+//        pictureAdapter = [[MTLJSONAdapter alloc] initWithModel:[MTWeiboPicture class]];
+//    });
+
+    return [MTLValueTransformer reversibleTransformerWithForwardBlock:^id(NSDictionary *dic) {
         NSMutableDictionary *pics = [NSMutableDictionary new];
         [dic enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-            MTWeiboPicture *pic = [pictureAdapter modelFromJSONDictionary:obj error:nil];
+          MTWeiboPicture *pic = [MTLJSONAdapter modelOfClass:MTWeiboPicture.class fromJSONDictionary:obj error:nil];
             if (pic) pics[key] = pic;
         }];
         return pics;
-    } reverseBlock:^id(NSDictionary *dic, BOOL *success, NSError *__autoreleasing *error) {
+    } reverseBlock:^id(NSDictionary *dic) {
         NSMutableDictionary *ret = [NSMutableDictionary new];
         [dic enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
             if ([obj isKindOfClass:[MTWeiboPicture class]]) {
-                NSDictionary *one = [pictureAdapter JSONDictionaryFromModel:obj error:nil];
+                NSDictionary *one = [MTLJSONAdapter JSONDictionaryFromModel:obj];
                 if (one) ret[key] = one;
             }
         }];
         return ret;
     }];
-    return [MTLJSONAdapter dictionaryTransformerWithModelClass:MTWeiboPicture.class];
+    return [NSValueTransformer mtl_JSONDictionaryTransformerWithModelClass:MTWeiboPicture.class];
 }
 + (NSValueTransformer *)urlStructJSONTransformer {
-    return [MTLJSONAdapter arrayTransformerWithModelClass:MTWeiboURL.class];
+    return [NSValueTransformer mtl_JSONArrayTransformerWithModelClass:MTWeiboURL.class];
 }
 + (NSValueTransformer *)createdAtJSONTransformer {
-    return [MTLValueTransformer transformerUsingForwardBlock:^id(NSString *dateString, BOOL *success, NSError *__autoreleasing *error) {
+    return [MTLValueTransformer reversibleTransformerWithForwardBlock:^id(NSString *dateString) {
         return [[DateFormatter weiboDataFormatter] dateFromString:dateString];
-    } reverseBlock:^id(NSDate *date, BOOL *success, NSError *__autoreleasing *error) {
+    } reverseBlock:^id(NSDate *date) {
         return [[DateFormatter weiboDataFormatter] stringFromDate:date];
     }];
 }
